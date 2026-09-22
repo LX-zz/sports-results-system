@@ -1,5 +1,3 @@
-"""Функции загрузки и сохранения объектов в JSON."""
-
 import json
 from pathlib import Path
 from typing import List
@@ -11,11 +9,9 @@ from models import (
     Result,
 )
 
-
 def load_json(
     filename: str,
 ) -> list:
-    """Загрузить данные из JSON-файла."""
     path = Path(filename)
 
     if not path.exists():

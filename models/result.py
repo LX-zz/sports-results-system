@@ -1,13 +1,9 @@
-"""Модель спортивного результата."""
-
 from models.athlete import Athlete
 from models.competition import Competition
 from models.discipline import Discipline
 
-
 class Result:
     """Спортивный результат спортсмена."""
-
     def __init__(
         self,
         result_id: int,
