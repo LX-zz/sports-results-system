@@ -22,8 +22,8 @@ def test_add_result():
     add_result(
         results,
         1,
-        "Бег 100 метров",
-        "Кубок МИРЭА",
+        1,
+        1,
         11.8,
         1,
         12.0,
@@ -38,8 +38,8 @@ def test_duplicate_result():
     add_result(
         results,
         1,
-        "Бег 100 метров",
-        "Кубок МИРЭА",
+        1,
+        1,
         11.8,
         1,
         12.0,
@@ -49,8 +49,8 @@ def test_duplicate_result():
         add_result(
             results,
             1,
-            "Бег 100 метров",
-            "Кубок МИРЭА",
+            1,
+            1,
             11.9,
             2,
             12.0,

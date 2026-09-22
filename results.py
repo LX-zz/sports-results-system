@@ -1,3 +1,6 @@
+"""Функции для работы со спортивными результатами."""
+
+
 def check_result(result: float) -> str:
     """Проверить корректность результата."""
     if result > 0:
@@ -34,27 +37,15 @@ def check_standard(
 def is_result_unique(
     results: list[dict],
     athlete_id: int,
-    discipline: str,
-    competition: str,
+    discipline_id: int,
+    competition_id: int,
 ) -> bool:
     """Проверить отсутствие повторного результата."""
     for item in results:
-        same_athlete = item["athlete_id"] == athlete_id
-
-        same_discipline = (
-            item["discipline"].lower()
-            == discipline.lower().strip()
-        )
-
-        same_competition = (
-            item["competition"].lower()
-            == competition.lower().strip()
-        )
-
         if (
-            same_athlete
-            and same_discipline
-            and same_competition
+            item["athlete_id"] == athlete_id
+            and item["discipline_id"] == discipline_id
+            and item["competition_id"] == competition_id
         ):
             return False
 
@@ -64,8 +55,8 @@ def is_result_unique(
 def add_result(
     results: list[dict],
     athlete_id: int,
-    discipline: str,
-    competition: str,
+    discipline_id: int,
+    competition_id: int,
     result: float,
     place: int,
     standard: float,
@@ -86,21 +77,11 @@ def add_result(
             "Место должно быть больше нуля"
         )
 
-    if not discipline.strip():
-        raise ValueError(
-            "Дисциплина не может быть пустой"
-        )
-
-    if not competition.strip():
-        raise ValueError(
-            "Соревнование не может быть пустым"
-        )
-
     if not is_result_unique(
         results,
         athlete_id,
-        discipline,
-        competition,
+        discipline_id,
+        competition_id,
     ):
         raise ValueError(
             "Такой результат уже существует"
@@ -109,18 +90,17 @@ def add_result(
     new_result = {
         "id": max(
             (item["id"] for item in results),
-            default=0
+            default=0,
         ) + 1,
         "athlete_id": athlete_id,
-        "discipline": discipline.strip(),
-        "competition": competition.strip(),
+        "discipline_id": discipline_id,
+        "competition_id": competition_id,
         "result": result,
         "place": place,
         "standard": standard,
     }
 
     results.append(new_result)
-
     return new_result
 
 
@@ -139,18 +119,13 @@ def delete_result(
 
 def find_results(
     results: list[dict],
-    query: str,
+    discipline_id: int,
 ) -> list[dict]:
-    """Найти результаты по дисциплине или соревнованию."""
-    query = query.lower().strip()
-
+    """Найти результаты по дисциплине."""
     return [
         item
         for item in results
-        if (
-            query in item["discipline"].lower()
-            or query in item["competition"].lower()
-        )
+        if item["discipline_id"] == discipline_id
     ]
 
 
@@ -160,7 +135,7 @@ def sort_results(
     """Отсортировать результаты от лучшего к худшему."""
     return sorted(
         results,
-        key=lambda item: item["result"]
+        key=lambda item: item["result"],
     )
 
 

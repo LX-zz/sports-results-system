@@ -10,6 +10,8 @@ def input_int(
             print(
                 "Ошибка: введите целое число"
             )
+
+
 def input_float(
     prompt: str,
 ) -> float:
