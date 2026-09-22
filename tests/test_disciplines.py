@@ -2,12 +2,13 @@ from disciplines import (
     add_discipline,
     find_disciplines,
 )
+from models import Discipline
 
 
 def test_add_and_find_discipline():
     disciplines = []
 
-    add_discipline(
+    discipline = add_discipline(
         disciplines,
         "Бег 100 метров",
         "сек.",
@@ -19,5 +20,6 @@ def test_add_and_find_discipline():
     )
 
     assert len(disciplines) == 1
+    assert isinstance(discipline, Discipline)
     assert len(found) == 1
-    assert found[0]["name"] == "Бег 100 метров"
+    assert found[0].name == "Бег 100 метров"

@@ -1,71 +1,68 @@
 """Функции для работы со спортивными дисциплинами."""
 
-from typing import Optional
+from typing import List, Optional
+
+from models import Discipline
 
 
 def add_discipline(
-    disciplines: list[dict],
+    disciplines: List[Discipline],
     name: str,
     unit: str,
-) -> dict:
-    """Добавить спортивную дисциплину."""
-    name = name.strip()
-    unit = unit.strip()
-
-    if not name:
-        raise ValueError("Название дисциплины не может быть пустым")
-
-    if not unit:
-        raise ValueError("Единица измерения не может быть пустой")
-
+) -> Discipline:
+    """Создать и добавить спортивную дисциплину."""
     for discipline in disciplines:
-        if discipline["name"].lower() == name.lower():
-            raise ValueError("Такая дисциплина уже существует")
+        if discipline.name.lower() == name.strip().lower():
+            raise ValueError(
+                "Такая дисциплина уже существует"
+            )
 
-    new_discipline = {
-        "id": max(
-            (item["id"] for item in disciplines),
-            default=0,
-        ) + 1,
-        "name": name,
-        "unit": unit,
-    }
+    discipline_id = max(
+        (discipline.id for discipline in disciplines),
+        default=0,
+    ) + 1
 
-    disciplines.append(new_discipline)
-    return new_discipline
+    discipline = Discipline(
+        discipline_id=discipline_id,
+        name=name,
+        unit=unit,
+    )
+
+    disciplines.append(discipline)
+    return discipline
 
 
 def find_disciplines(
-    disciplines: list[dict],
+    disciplines: List[Discipline],
     query: str,
-) -> list[dict]:
+) -> List[Discipline]:
     """Найти дисциплины по названию."""
     query = query.lower().strip()
 
     return [
         discipline
         for discipline in disciplines
-        if query in discipline["name"].lower()
+        if query in discipline.name.lower()
     ]
 
 
 def sort_disciplines(
-    disciplines: list[dict],
-) -> list[dict]:
+    disciplines: List[Discipline],
+) -> List[Discipline]:
     """Отсортировать дисциплины по названию."""
     return sorted(
         disciplines,
-        key=lambda item: item["name"].lower(),
+        key=lambda discipline: discipline.name.lower(),
     )
 
 
 def get_discipline_by_id(
-    disciplines: list[dict],
+    disciplines: List[Discipline],
     discipline_id: int,
-) -> Optional[dict]:
+) -> Optional[Discipline]:
     """Найти дисциплину по ID."""
     for discipline in disciplines:
-        if discipline["id"] == discipline_id:
+        if discipline.id == discipline_id:
             return discipline
 
     return None

@@ -1,45 +1,67 @@
 import pytest
 
+from models import (
+    Athlete,
+    Competition,
+    Discipline,
+)
 from results import (
     add_result,
-    check_standard,
     get_statistics,
 )
 
 
-def test_check_standard():
-    result = check_standard(
-        11.7,
-        12.0,
+def create_objects():
+    athlete = Athlete(
+        1,
+        "Иван Иванов",
+        2005,
     )
 
-    assert result == "Норматив выполнен"
+    discipline = Discipline(
+        1,
+        "Бег 100 метров",
+        "сек.",
+    )
+
+    competition = Competition(
+        1,
+        "Кубок РТУ МИРЭА",
+        "2026-09-20",
+    )
+
+    return athlete, discipline, competition
 
 
 def test_add_result():
     results = []
 
-    add_result(
+    athlete, discipline, competition = create_objects()
+
+    result = add_result(
         results,
-        1,
-        1,
-        1,
+        athlete,
+        discipline,
+        competition,
         11.8,
         1,
         12.0,
     )
 
     assert len(results) == 1
+    assert result.athlete is athlete
 
 
 def test_duplicate_result():
     results = []
 
+    athlete, discipline, competition = create_objects()
+
     add_result(
         results,
-        1,
-        1,
-        1,
+        athlete,
+        discipline,
+        competition,
         11.8,
         1,
         12.0,
@@ -48,9 +70,9 @@ def test_duplicate_result():
     with pytest.raises(ValueError):
         add_result(
             results,
-            1,
-            1,
-            1,
+            athlete,
+            discipline,
+            competition,
             11.9,
             2,
             12.0,
@@ -58,10 +80,35 @@ def test_duplicate_result():
 
 
 def test_statistics():
-    results = [
-        {"result": 11.5},
-        {"result": 12.5},
-    ]
+    results = []
+
+    athlete, discipline, competition = create_objects()
+
+    add_result(
+        results,
+        athlete,
+        discipline,
+        competition,
+        11.5,
+        1,
+        12.0,
+    )
+
+    second_athlete = Athlete(
+        2,
+        "Петр Петров",
+        2004,
+    )
+
+    add_result(
+        results,
+        second_athlete,
+        discipline,
+        competition,
+        12.5,
+        2,
+        13.0,
+    )
 
     statistics = get_statistics(
         results

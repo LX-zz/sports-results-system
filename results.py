@@ -1,116 +1,56 @@
 """Функции для работы со спортивными результатами."""
 
+from typing import List
 
-def check_result(result: float) -> str:
-    """Проверить корректность результата."""
-    if result > 0:
-        return "Результат корректный"
-
-    return "Ошибка: результат должен быть больше 0"
-
-
-def get_place_status(place: int) -> str:
-    """Определить статус спортсмена по месту."""
-    if place == 1:
-        return "Золотая медаль"
-
-    if place == 2:
-        return "Серебряная медаль"
-
-    if place == 3:
-        return "Бронзовая медаль"
-
-    return "Участник соревнования"
-
-
-def check_standard(
-    result: float,
-    standard: float,
-) -> str:
-    """Проверить выполнение норматива."""
-    if result <= standard:
-        return "Норматив выполнен"
-
-    return "Норматив не выполнен"
-
-
-def is_result_unique(
-    results: list[dict],
-    athlete_id: int,
-    discipline_id: int,
-    competition_id: int,
-) -> bool:
-    """Проверить отсутствие повторного результата."""
-    for item in results:
-        if (
-            item["athlete_id"] == athlete_id
-            and item["discipline_id"] == discipline_id
-            and item["competition_id"] == competition_id
-        ):
-            return False
-
-    return True
+from models import Competition, Discipline, Athlete, Result
 
 
 def add_result(
-    results: list[dict],
-    athlete_id: int,
-    discipline_id: int,
-    competition_id: int,
-    result: float,
+    results: List[Result],
+    athlete: Athlete,
+    discipline: Discipline,
+    competition: Competition,
+    value: float,
     place: int,
     standard: float,
-) -> dict:
-    """Добавить спортивный результат."""
-    if result <= 0:
-        raise ValueError(
-            "Результат должен быть больше нуля"
-        )
+) -> Result:
+    """Создать и добавить спортивный результат."""
+    for item in results:
+        if (
+            item.athlete.id == athlete.id
+            and item.discipline.id == discipline.id
+            and item.competition.id == competition.id
+        ):
+            raise ValueError(
+                "Такой результат уже существует"
+            )
 
-    if standard <= 0:
-        raise ValueError(
-            "Норматив должен быть больше нуля"
-        )
+    result_id = max(
+        (item.id for item in results),
+        default=0,
+    ) + 1
 
-    if place <= 0:
-        raise ValueError(
-            "Место должно быть больше нуля"
-        )
+    result = Result(
+        result_id=result_id,
+        athlete=athlete,
+        discipline=discipline,
+        competition=competition,
+        value=value,
+        place=place,
+        standard=standard,
+    )
 
-    if not is_result_unique(
-        results,
-        athlete_id,
-        discipline_id,
-        competition_id,
-    ):
-        raise ValueError(
-            "Такой результат уже существует"
-        )
-
-    new_result = {
-        "id": max(
-            (item["id"] for item in results),
-            default=0,
-        ) + 1,
-        "athlete_id": athlete_id,
-        "discipline_id": discipline_id,
-        "competition_id": competition_id,
-        "result": result,
-        "place": place,
-        "standard": standard,
-    }
-
-    results.append(new_result)
-    return new_result
+    results.append(result)
+    return result
 
 
 def delete_result(
-    results: list[dict],
+    results: List[Result],
     result_id: int,
 ) -> bool:
     """Удалить результат по ID."""
-    for index, item in enumerate(results):
-        if item["id"] == result_id:
+    for index, result in enumerate(results):
+        if result.id == result_id:
             del results[index]
             return True
 
@@ -118,29 +58,29 @@ def delete_result(
 
 
 def find_results(
-    results: list[dict],
+    results: List[Result],
     discipline_id: int,
-) -> list[dict]:
+) -> List[Result]:
     """Найти результаты по дисциплине."""
     return [
-        item
-        for item in results
-        if item["discipline_id"] == discipline_id
+        result
+        for result in results
+        if result.discipline.id == discipline_id
     ]
 
 
 def sort_results(
-    results: list[dict],
-) -> list[dict]:
-    """Отсортировать результаты от лучшего к худшему."""
+    results: List[Result],
+) -> List[Result]:
+    """Отсортировать результаты."""
     return sorted(
         results,
-        key=lambda item: item["result"],
+        key=lambda result: result.value,
     )
 
 
 def get_statistics(
-    results: list[dict],
+    results: List[Result],
 ) -> dict:
     """Получить статистику результатов."""
     if not results:
@@ -151,8 +91,8 @@ def get_statistics(
         }
 
     values = [
-        item["result"]
-        for item in results
+        result.value
+        for result in results
     ]
 
     return {

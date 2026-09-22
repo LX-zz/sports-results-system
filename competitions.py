@@ -1,70 +1,77 @@
 """Функции для работы с соревнованиями."""
 
-from typing import Optional
+from typing import List, Optional
+
+from models import Competition
 
 
 def add_competition(
-    competitions: list[dict],
+    competitions: List[Competition],
     name: str,
     competition_date: str,
-) -> dict:
-    """Добавить соревнование."""
-    name = name.strip()
-
-    if not name:
-        raise ValueError("Название соревнования не может быть пустым")
-
+) -> Competition:
+    """Создать и добавить соревнование."""
     for competition in competitions:
-        same_name = competition["name"].lower() == name.lower()
-        same_date = competition["date"] == competition_date
+        same_name = (
+            competition.name.lower()
+            == name.strip().lower()
+        )
+        same_date = (
+            competition.date
+            == competition_date.strip()
+        )
 
         if same_name and same_date:
-            raise ValueError("Такое соревнование уже существует")
+            raise ValueError(
+                "Такое соревнование уже существует"
+            )
 
-    new_competition = {
-        "id": max(
-            (item["id"] for item in competitions),
-            default=0,
-        ) + 1,
-        "name": name,
-        "date": competition_date,
-    }
+    competition_id = max(
+        (competition.id for competition in competitions),
+        default=0,
+    ) + 1
 
-    competitions.append(new_competition)
-    return new_competition
+    competition = Competition(
+        competition_id=competition_id,
+        name=name,
+        competition_date=competition_date,
+    )
+
+    competitions.append(competition)
+    return competition
 
 
 def find_competitions(
-    competitions: list[dict],
+    competitions: List[Competition],
     query: str,
-) -> list[dict]:
+) -> List[Competition]:
     """Найти соревнования по названию."""
     query = query.lower().strip()
 
     return [
         competition
         for competition in competitions
-        if query in competition["name"].lower()
+        if query in competition.name.lower()
     ]
 
 
 def sort_competitions(
-    competitions: list[dict],
-) -> list[dict]:
+    competitions: List[Competition],
+) -> List[Competition]:
     """Отсортировать соревнования по дате."""
     return sorted(
         competitions,
-        key=lambda item: item["date"],
+        key=lambda competition: competition.date,
     )
 
 
 def get_competition_by_id(
-    competitions: list[dict],
+    competitions: List[Competition],
     competition_id: int,
-) -> Optional[dict]:
+) -> Optional[Competition]:
     """Найти соревнование по ID."""
     for competition in competitions:
-        if competition["id"] == competition_id:
+        if competition.id == competition_id:
             return competition
 
     return None

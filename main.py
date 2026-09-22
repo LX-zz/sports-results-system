@@ -1,36 +1,41 @@
+"""Главный модуль системы учета спортивных результатов."""
+
+from typing import List
+
 from athletes import (
     add_athlete,
     get_athlete_by_id,
     sort_athletes,
 )
-
 from competitions import (
     add_competition,
     get_competition_by_id,
     sort_competitions,
 )
-
 from disciplines import (
     add_discipline,
     get_discipline_by_id,
     sort_disciplines,
 )
-
+from models import (
+    Athlete,
+    Competition,
+    Discipline,
+    Result,
+)
 from results import (
     add_result,
-    check_result,
-    check_standard,
     delete_result,
-    get_place_status,
     get_statistics,
     sort_results,
 )
-
 from storage import (
-    load_json,
-    save_json,
+    load_athletes,
+    load_competitions,
+    load_disciplines,
+    load_results,
+    save_objects,
 )
-
 from utils import (
     input_float,
     input_int,
@@ -44,8 +49,9 @@ RESULTS_FILE = "data/results.json"
 
 
 def show_athletes(
-    athletes: list[dict],
+    athletes: List[Athlete],
 ) -> None:
+    """Вывести спортсменов."""
     if not athletes:
         print("Список спортсменов пуст")
         return
@@ -53,16 +59,13 @@ def show_athletes(
     print("\nСпортсмены:")
 
     for athlete in sort_athletes(athletes):
-        print(
-            f'{athlete["id"]}. '
-            f'{athlete["full_name"]} | '
-            f'{athlete["birth_year"]} г.р.'
-        )
+        print(athlete)
 
 
 def show_disciplines(
-    disciplines: list[dict],
+    disciplines: List[Discipline],
 ) -> None:
+    """Вывести спортивные дисциплины."""
     if not disciplines:
         print("Список дисциплин пуст")
         return
@@ -70,16 +73,13 @@ def show_disciplines(
     print("\nДисциплины:")
 
     for discipline in sort_disciplines(disciplines):
-        print(
-            f'{discipline["id"]}. '
-            f'{discipline["name"]} | '
-            f'{discipline["unit"]}'
-        )
+        print(discipline)
 
 
 def show_competitions(
-    competitions: list[dict],
+    competitions: List[Competition],
 ) -> None:
+    """Вывести соревнования."""
     if not competitions:
         print("Список соревнований пуст")
         return
@@ -87,74 +87,45 @@ def show_competitions(
     print("\nСоревнования:")
 
     for competition in sort_competitions(competitions):
-        print(
-            f'{competition["id"]}. '
-            f'{competition["name"]} | '
-            f'{competition["date"]}'
-        )
+        print(competition)
 
 
 def show_results(
-    results: list[dict],
-    athletes: list[dict],
-    disciplines: list[dict],
-    competitions: list[dict],
+    results: List[Result],
 ) -> None:
+    """Вывести спортивные результаты."""
     if not results:
         print("Список результатов пуст")
         return
 
-    print("\nРезультаты:")
+    print("\nСпортивные результаты:")
 
-    for item in sort_results(results):
-        athlete = get_athlete_by_id(
-            athletes,
-            item["athlete_id"],
-        )
+    for result in sort_results(results):
+        print(result)
 
-        discipline = get_discipline_by_id(
-            disciplines,
-            item["discipline_id"],
-        )
-
-        competition = get_competition_by_id(
-            competitions,
-            item["competition_id"],
-        )
-
-        athlete_name = (
-            athlete["full_name"]
-            if athlete
-            else "Неизвестный спортсмен"
-        )
-
-        discipline_name = (
-            discipline["name"]
-            if discipline
-            else "Неизвестная дисциплина"
-        )
-
-        competition_name = (
-            competition["name"]
-            if competition
-            else "Неизвестное соревнование"
+        standard_status = (
+            "Норматив выполнен"
+            if result.check_standard()
+            else "Норматив не выполнен"
         )
 
         print(
-            f'{item["id"]}. '
-            f'{athlete_name} | '
-            f'{discipline_name} | '
-            f'{competition_name} | '
-            f'{item["result"]} | '
-            f'место {item["place"]}'
+            f"   {result.get_place_status()} | "
+            f"{standard_status}"
         )
 
 
 def create_athlete(
-    athletes: list[dict],
+    athletes: List[Athlete],
 ) -> None:
-    full_name = input("ФИО спортсмена: ")
-    birth_year = input_int("Год рождения: ")
+    """Создать спортсмена."""
+    full_name = input(
+        "ФИО спортсмена: "
+    )
+
+    birth_year = input_int(
+        "Год рождения: "
+    )
 
     try:
         athlete = add_athlete(
@@ -167,21 +138,27 @@ def create_athlete(
         print(f"Ошибка: {error}")
         return
 
-    save_json(
+    save_objects(
         ATHLETES_FILE,
         athletes,
     )
 
     print(
-        f'Спортсмен {athlete["full_name"]} добавлен'
+        f"Спортсмен добавлен: {athlete}"
     )
 
 
 def create_discipline(
-    disciplines: list[dict],
+    disciplines: List[Discipline],
 ) -> None:
-    name = input("Название дисциплины: ")
-    unit = input("Единица измерения: ")
+    """Создать спортивную дисциплину."""
+    name = input(
+        "Название дисциплины: "
+    )
+
+    unit = input(
+        "Единица измерения: "
+    )
 
     try:
         discipline = add_discipline(
@@ -194,90 +171,120 @@ def create_discipline(
         print(f"Ошибка: {error}")
         return
 
-    save_json(
+    save_objects(
         DISCIPLINES_FILE,
         disciplines,
     )
 
     print(
-        f'Дисциплина {discipline["name"]} добавлена'
+        f"Дисциплина добавлена: {discipline}"
     )
 
 
 def create_competition(
-    competitions: list[dict],
+    competitions: List[Competition],
 ) -> None:
-    name = input("Название соревнования: ")
-    date = input("Дата в формате ГГГГ-ММ-ДД: ")
+    """Создать соревнование."""
+    name = input(
+        "Название соревнования: "
+    )
+
+    competition_date = input(
+        "Дата в формате ГГГГ-ММ-ДД: "
+    )
 
     try:
         competition = add_competition(
             competitions,
             name,
-            date,
+            competition_date,
         )
 
     except ValueError as error:
         print(f"Ошибка: {error}")
         return
 
-    save_json(
+    save_objects(
         COMPETITIONS_FILE,
         competitions,
     )
 
     print(
-        f'Соревнование {competition["name"]} добавлено'
+        f"Соревнование добавлено: {competition}"
     )
 
 
 def create_result(
-    results: list[dict],
-    athletes: list[dict],
-    disciplines: list[dict],
-    competitions: list[dict],
+    results: List[Result],
+    athletes: List[Athlete],
+    disciplines: List[Discipline],
+    competitions: List[Competition],
 ) -> None:
+    """Создать спортивный результат."""
     show_athletes(athletes)
-    athlete_id = input_int("ID спортсмена: ")
 
-    if get_athlete_by_id(
+    athlete_id = input_int(
+        "ID спортсмена: "
+    )
+
+    athlete = get_athlete_by_id(
         athletes,
         athlete_id,
-    ) is None:
+    )
+
+    if athlete is None:
         print("Спортсмен не найден")
         return
 
     show_disciplines(disciplines)
-    discipline_id = input_int("ID дисциплины: ")
 
-    if get_discipline_by_id(
+    discipline_id = input_int(
+        "ID дисциплины: "
+    )
+
+    discipline = get_discipline_by_id(
         disciplines,
         discipline_id,
-    ) is None:
+    )
+
+    if discipline is None:
         print("Дисциплина не найдена")
         return
 
     show_competitions(competitions)
-    competition_id = input_int("ID соревнования: ")
 
-    if get_competition_by_id(
+    competition_id = input_int(
+        "ID соревнования: "
+    )
+
+    competition = get_competition_by_id(
         competitions,
         competition_id,
-    ) is None:
+    )
+
+    if competition is None:
         print("Соревнование не найдено")
         return
 
-    result = input_float("Результат: ")
-    place = input_int("Занятое место: ")
-    standard = input_float("Норматив: ")
+    value = input_float(
+        "Результат: "
+    )
+
+    place = input_int(
+        "Занятое место: "
+    )
+
+    standard = input_float(
+        "Норматив: "
+    )
 
     try:
-        new_result = add_result(
+        result = add_result(
             results,
-            athlete_id,
-            discipline_id,
-            competition_id,
-            result,
+            athlete,
+            discipline,
+            competition,
+            value,
             place,
             standard,
         )
@@ -286,24 +293,29 @@ def create_result(
         print(f"Ошибка: {error}")
         return
 
-    save_json(
+    save_objects(
         RESULTS_FILE,
         results,
     )
 
-    print(check_result(new_result["result"]))
-    print(get_place_status(new_result["place"]))
     print(
-        check_standard(
-            new_result["result"],
-            new_result["standard"],
-        )
+        f"Результат добавлен: {result}"
     )
+
+    print(
+        result.get_place_status()
+    )
+
+    if result.check_standard():
+        print("Норматив выполнен")
+    else:
+        print("Норматив не выполнен")
 
 
 def remove_result(
-    results: list[dict],
+    results: List[Result],
 ) -> None:
+    """Удалить спортивный результат."""
     result_id = input_int(
         "ID результата: "
     )
@@ -312,7 +324,7 @@ def remove_result(
         results,
         result_id,
     ):
-        save_json(
+        save_objects(
             RESULTS_FILE,
             results,
         )
@@ -324,8 +336,9 @@ def remove_result(
 
 
 def show_statistics(
-    results: list[dict],
+    results: List[Result],
 ) -> None:
+    """Вывести статистику."""
     statistics = get_statistics(
         results
     )
@@ -354,6 +367,7 @@ def show_statistics(
 
 
 def print_menu() -> None:
+    """Вывести главное меню."""
     print(
         "\n=== Система учета "
         "спортивных результатов ==="
@@ -373,20 +387,24 @@ def print_menu() -> None:
 
 
 def main() -> None:
-    athletes = load_json(
+    """Запустить приложение."""
+    athletes = load_athletes(
         ATHLETES_FILE
     )
 
-    disciplines = load_json(
+    disciplines = load_disciplines(
         DISCIPLINES_FILE
     )
 
-    competitions = load_json(
+    competitions = load_competitions(
         COMPETITIONS_FILE
     )
 
-    results = load_json(
-        RESULTS_FILE
+    results = load_results(
+        RESULTS_FILE,
+        athletes,
+        disciplines,
+        competitions,
     )
 
     while True:
@@ -415,12 +433,7 @@ def main() -> None:
             create_competition(competitions)
 
         elif choice == "7":
-            show_results(
-                results,
-                athletes,
-                disciplines,
-                competitions,
-            )
+            show_results(results)
 
         elif choice == "8":
             create_result(
