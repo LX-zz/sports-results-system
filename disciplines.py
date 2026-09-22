@@ -1,5 +1,3 @@
-"""Функции для работы со спортивными дисциплинами."""
-
 from typing import List, Optional
 
 from models import Discipline

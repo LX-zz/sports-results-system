@@ -1,5 +1,3 @@
-"""Главный модуль системы учета спортивных результатов."""
-
 from typing import List
 
 from athletes import (

@@ -1,5 +1,3 @@
-"""Функции для работы со спортивными результатами."""
-
 from typing import List
 
 from models import Competition, Discipline, Athlete, Result

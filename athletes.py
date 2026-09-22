@@ -1,5 +1,3 @@
-"""Функции для работы со спортсменами."""
-
 from typing import List, Optional
 
 from models import Athlete

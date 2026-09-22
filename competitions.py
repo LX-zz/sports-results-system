@@ -1,5 +1,3 @@
-"""Функции для работы с соревнованиями."""
-
 from typing import List, Optional
 
 from models import Competition
