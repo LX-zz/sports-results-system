@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Результат — Sports Results
+{% endblock %}
+
+{% block content %}
+
+{% if result %}
+
+<h1>
+    Результат №{{ result.id }}
+</h1>
+
+<div class="card mt-4">
+    <div class="card-body">
+
+        <p>
+            <strong>Спортсмен:</strong>
+            {{ result.athlete.full_name }}
+        </p>
+
+        <p>
+            <strong>Дисциплина:</strong>
+            {{ result.discipline.name }}
+        </p>
+
+        <p>
+            <strong>Соревнование:</strong>
+            {{ result.competition.name }}
+        </p>
+
+        <p>
+            <strong>Результат:</strong>
+            {{ result.value }}
+            {{ result.discipline.unit }}
+        </p>
+
+        <p>
+            <strong>Место:</strong>
+            {{ result.place }}
+        </p>
+
+        <p>
+            <strong>Статус:</strong>
+            {{ result.get_place_status }}
+        </p>
+
+        <p>
+    <strong>Норматив:</strong>
+    {% include "sports/includes/result_status.html" %}
+</p>
+
+    </div>
+</div>
+
+<a
+    class="btn btn-secondary mt-4"
+    href="{% url 'sports:results' %}">
+    ← К списку результатов
+</a>
+
+{% else %}
+
+<h1 class="text-danger">
+    Результат не найден
+</h1>
+
+<a
+    class="btn btn-primary"
+    href="{% url 'sports:results' %}">
+    К списку результатов
+</a>
+
+{% endif %}
+
+{% endblock %}

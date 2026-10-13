@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Главная — Sports Results
+{% endblock %}
+
+{% block content %}
+
+<div class="p-5 bg-light rounded-3">
+
+    <h1 class="display-5">
+        Система учета спортивных результатов
+    </h1>
+
+    <p class="lead">
+        Веб-интерфейс для учета спортсменов,
+        соревнований и спортивных результатов.
+    </p>
+
+    <p>
+        Проект использует объектную модель
+        предыдущих практических работ
+        и данные из JSON-файлов.
+    </p>
+
+    <a
+        class="btn btn-primary me-2"
+        href="{% url 'sports:athletes' %}">
+        Спортсмены
+    </a>
+
+    <a
+        class="btn btn-secondary me-2"
+        href="{% url 'sports:results' %}">
+        Результаты
+    </a>
+
+    <a
+        class="btn btn-dark"
+        href="{% url 'sports:competitions' %}">
+        Соревнования
+    </a>
+
+</div>
+
+{% endblock %}

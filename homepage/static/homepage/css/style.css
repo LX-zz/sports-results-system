@@ -1,0 +1,19 @@
+body {
+    background-color: #ffffff;
+}
+
+main {
+    min-height: 75vh;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.navbar-brand {
+    font-weight: 600;
+}
+
+footer {
+    margin-top: 40px;
+}

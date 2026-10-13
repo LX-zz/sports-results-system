@@ -183,6 +183,69 @@ result.competition.name
 ```python
 handler404 = "homepage.views.page_not_found"
 
+## Практическая работа №6
+
+В ПР6 веб-интерфейс проекта переведен
+на систему шаблонов Django.
+
+Реализованы:
+
+- Django Template Language;
+- базовый шаблон `base.html`;
+- наследование шаблонов через `extends`;
+- блоки `block`;
+- включаемые шаблоны через `include`;
+- передача данных через `context`;
+- циклы `for`;
+- условные конструкции `if`;
+- обработка пустых коллекций;
+- фильтр `length`;
+- именованные URL;
+- пространства имен приложений;
+- ссылки через `{% url %}`;
+- статические CSS-файлы;
+- JavaScript;
+- статическое изображение;
+- собственное оформление проекта.
+
+HTML больше не формируется внутри view-функций.
+
+View-функции получают данные предметной области
+и передают их в шаблоны через `render()`.
+
+### Структура шаблонов
+
+```text
+templates/
+├── base.html
+└── includes/
+    └── navigation.html
+
+homepage/
+├── templates/
+│   └── homepage/
+│       ├── index.html
+│       └── 404.html
+└── static/
+    └── homepage/
+        ├── css/
+        │   └── style.css
+        ├── js/
+        │   └── main.js
+        └── img/
+            └── logo.svg
+
+sports/
+└── templates/
+    └── sports/
+        ├── athlete_list.html
+        ├── athlete_detail.html
+        ├── result_list.html
+        ├── result_detail.html
+        ├── competition_list.html
+        └── includes/
+            └── result_status.html
+
 
 
 

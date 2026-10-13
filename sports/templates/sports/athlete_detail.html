@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Спортсмен — Sports Results
+{% endblock %}
+
+{% block content %}
+
+{% if athlete %}
+
+<h1>
+    {{ athlete.full_name }}
+</h1>
+
+<p>
+    <strong>ID:</strong>
+    {{ athlete.id }}
+</p>
+
+<p>
+    <strong>Год рождения:</strong>
+    {{ athlete.birth_year }}
+</p>
+
+<h2 class="mt-4">
+    Результаты спортсмена
+</h2>
+
+<ul class="list-group">
+    {% for result in athlete_results %}
+        <li class="list-group-item">
+            {{ result.discipline.name }}:
+            {{ result.value }}
+            {{ result.discipline.unit }},
+            место {{ result.place }}
+        </li>
+    {% empty %}
+        <li class="list-group-item">
+            Результаты отсутствуют.
+        </li>
+    {% endfor %}
+</ul>
+
+<a
+    class="btn btn-secondary mt-4"
+    href="{% url 'sports:athletes' %}">
+    ← К списку спортсменов
+</a>
+
+{% else %}
+
+<h1 class="text-danger">
+    Спортсмен не найден
+</h1>
+
+<a
+    class="btn btn-primary"
+    href="{% url 'sports:athletes' %}">
+    К списку спортсменов
+</a>
+
+{% endif %}
+
+{% endblock %}

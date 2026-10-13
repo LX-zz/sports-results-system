@@ -1,0 +1,41 @@
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+
+    {% load static %}
+
+<a
+    class="navbar-brand d-flex align-items-center gap-2"
+    href="{% url 'homepage:index' %}">
+
+    <img
+        src="{% static 'homepage/img/logo.svg' %}"
+        alt="Sports Results"
+        width="32"
+        height="32"
+    >
+
+    Sports Results
+</a>
+
+        <div>
+            <a
+                class="btn btn-outline-light"
+                href="{% url 'sports:athletes' %}">
+                Спортсмены
+            </a>
+
+            <a
+                class="btn btn-outline-light"
+                href="{% url 'sports:results' %}">
+                Результаты
+            </a>
+
+            <a
+                class="btn btn-outline-light"
+                href="{% url 'sports:competitions' %}">
+                Соревнования
+            </a>
+        </div>
+
+    </div>
+</nav>
