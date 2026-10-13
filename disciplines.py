@@ -11,14 +11,15 @@ def add_discipline(
     """Создать и добавить спортивную дисциплину."""
     for discipline in disciplines:
         if discipline.name.lower() == name.strip().lower():
-            raise ValueError(
-                "Такая дисциплина уже существует"
-            )
+            raise ValueError("Такая дисциплина уже существует")
 
-    discipline_id = max(
-        (discipline.id for discipline in disciplines),
-        default=0,
-    ) + 1
+    discipline_id = (
+        max(
+            (discipline.id for discipline in disciplines),
+            default=0,
+        )
+        + 1
+    )
 
     discipline = Discipline(
         discipline_id=discipline_id,
@@ -38,9 +39,7 @@ def find_disciplines(
     query = query.lower().strip()
 
     return [
-        discipline
-        for discipline in disciplines
-        if query in discipline.name.lower()
+        discipline for discipline in disciplines if query in discipline.name.lower()
     ]
 
 

@@ -1,14 +1,7 @@
 import pytest
 
-from models import (
-    Athlete,
-    Competition,
-    Discipline,
-)
-from results import (
-    add_result,
-    get_statistics,
-)
+from models import Athlete, Competition, Discipline
+from results import add_result, get_statistics
 
 
 def create_objects():
@@ -110,9 +103,7 @@ def test_statistics():
         13.0,
     )
 
-    statistics = get_statistics(
-        results
-    )
+    statistics = get_statistics(results)
 
     assert statistics["count"] == 2
     assert statistics["best_result"] == 11.5

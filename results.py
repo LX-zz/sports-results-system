@@ -1,6 +1,6 @@
 from typing import List
 
-from models import Competition, Discipline, Athlete, Result
+from models import Athlete, Competition, Discipline, Result
 
 
 def add_result(
@@ -19,14 +19,15 @@ def add_result(
             and item.discipline.id == discipline.id
             and item.competition.id == competition.id
         ):
-            raise ValueError(
-                "Такой результат уже существует"
-            )
+            raise ValueError("Такой результат уже существует")
 
-    result_id = max(
-        (item.id for item in results),
-        default=0,
-    ) + 1
+    result_id = (
+        max(
+            (item.id for item in results),
+            default=0,
+        )
+        + 1
+    )
 
     result = Result(
         result_id=result_id,
@@ -60,11 +61,7 @@ def find_results(
     discipline_id: int,
 ) -> List[Result]:
     """Найти результаты по дисциплине."""
-    return [
-        result
-        for result in results
-        if result.discipline.id == discipline_id
-    ]
+    return [result for result in results if result.discipline.id == discipline_id]
 
 
 def sort_results(
@@ -88,10 +85,7 @@ def get_statistics(
             "average_result": None,
         }
 
-    values = [
-        result.value
-        for result in results
-    ]
+    values = [result.value for result in results]
 
     return {
         "count": len(values),

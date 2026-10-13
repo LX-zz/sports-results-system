@@ -1,11 +1,6 @@
 import pytest
 
-from models import (
-    Athlete,
-    Competition,
-    Discipline,
-    Result,
-)
+from models import Athlete, Competition, Discipline, Result
 
 
 def test_athlete_creation():
@@ -27,9 +22,7 @@ def test_athlete_str():
         2005,
     )
 
-    assert str(athlete) == (
-        "1. Иван Иванов | 2005 г.р."
-    )
+    assert str(athlete) == ("1. Иван Иванов | 2005 г.р.")
 
 
 def test_discipline_creation():
@@ -151,10 +144,7 @@ def test_result_place_status():
         12.0,
     )
 
-    assert (
-        result.get_place_status()
-        == "Серебряная медаль"
-    )
+    assert result.get_place_status() == "Серебряная медаль"
 
 
 def test_invalid_athlete():

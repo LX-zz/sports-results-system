@@ -1,7 +1,4 @@
-from athletes import (
-    add_athlete,
-    find_athletes,
-)
+from athletes import add_athlete, find_athletes
 from models import Athlete
 
 

@@ -1,7 +1,4 @@
-from competitions import (
-    add_competition,
-    find_competitions,
-)
+from competitions import add_competition, find_competitions
 
 
 def test_add_and_find_competition():

@@ -2,12 +2,8 @@ import json
 from pathlib import Path
 from typing import List
 
-from models import (
-    Athlete,
-    Competition,
-    Discipline,
-    Result,
-)
+from models import Athlete, Competition, Discipline, Result
+
 
 def load_json(
     filename: str,
@@ -25,16 +21,11 @@ def load_json(
             data = json.load(file)
 
     except json.JSONDecodeError:
-        print(
-            f"Ошибка: файл {filename} "
-            "содержит некорректный JSON"
-        )
+        print(f"Ошибка: файл {filename} " "содержит некорректный JSON")
         return []
 
     except OSError as error:
-        print(
-            f"Ошибка чтения файла: {error}"
-        )
+        print(f"Ошибка чтения файла: {error}")
         return []
 
     if not isinstance(data, list):
@@ -49,10 +40,7 @@ def load_athletes(
     """Загрузить спортсменов из JSON."""
     data = load_json(filename)
 
-    return [
-        Athlete.from_data(item)
-        for item in data
-    ]
+    return [Athlete.from_data(item) for item in data]
 
 
 def load_disciplines(
@@ -61,10 +49,7 @@ def load_disciplines(
     """Загрузить дисциплины из JSON."""
     data = load_json(filename)
 
-    return [
-        Discipline.from_data(item)
-        for item in data
-    ]
+    return [Discipline.from_data(item) for item in data]
 
 
 def load_competitions(
@@ -73,10 +58,7 @@ def load_competitions(
     """Загрузить соревнования из JSON."""
     data = load_json(filename)
 
-    return [
-        Competition.from_data(item)
-        for item in data
-    ]
+    return [Competition.from_data(item) for item in data]
 
 
 def load_results(
@@ -91,11 +73,7 @@ def load_results(
 
     for item in data:
         athlete = next(
-            (
-                athlete
-                for athlete in athletes
-                if athlete.id == item["athlete_id"]
-            ),
+            (athlete for athlete in athletes if athlete.id == item["athlete_id"]),
             None,
         )
 
@@ -117,11 +95,7 @@ def load_results(
             None,
         )
 
-        if (
-            athlete is None
-            or discipline is None
-            or competition is None
-        ):
+        if athlete is None or discipline is None or competition is None:
             continue
 
         result = Result(
@@ -151,10 +125,7 @@ def save_objects(
         exist_ok=True,
     )
 
-    data = [
-        item.to_data()
-        for item in objects
-    ]
+    data = [item.to_data() for item in objects]
 
     try:
         with path.open(
@@ -169,6 +140,4 @@ def save_objects(
             )
 
     except OSError as error:
-        print(
-            f"Ошибка сохранения файла: {error}"
-        )
+        print(f"Ошибка сохранения файла: {error}")

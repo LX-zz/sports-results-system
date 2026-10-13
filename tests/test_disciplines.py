@@ -1,7 +1,4 @@
-from disciplines import (
-    add_discipline,
-    find_disciplines,
-)
+from disciplines import add_discipline, find_disciplines
 from models import Discipline
 
 

@@ -2,8 +2,8 @@ from models.athlete import Athlete
 from models.competition import Competition
 from models.discipline import Discipline
 
+
 class Result:
-    """Спортивный результат спортсмена."""
     def __init__(
         self,
         result_id: int,
@@ -16,19 +16,13 @@ class Result:
     ) -> None:
         """Создать объект результата."""
         if value <= 0:
-            raise ValueError(
-                "Результат должен быть больше нуля"
-            )
+            raise ValueError("Результат должен быть больше нуля")
 
         if place <= 0:
-            raise ValueError(
-                "Место должно быть больше нуля"
-            )
+            raise ValueError("Место должно быть больше нуля")
 
         if standard <= 0:
-            raise ValueError(
-                "Норматив должен быть больше нуля"
-            )
+            raise ValueError("Норматив должен быть больше нуля")
 
         self.id = result_id
         self.athlete = athlete

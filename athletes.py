@@ -9,10 +9,13 @@ def add_athlete(
     birth_year: int,
 ) -> Athlete:
     """Создать и добавить спортсмена."""
-    athlete_id = max(
-        (athlete.id for athlete in athletes),
-        default=0,
-    ) + 1
+    athlete_id = (
+        max(
+            (athlete.id for athlete in athletes),
+            default=0,
+        )
+        + 1
+    )
 
     athlete = Athlete(
         athlete_id=athlete_id,
@@ -31,11 +34,7 @@ def find_athletes(
     """Найти спортсменов по имени."""
     query = query.lower().strip()
 
-    return [
-        athlete
-        for athlete in athletes
-        if query in athlete.full_name.lower()
-    ]
+    return [athlete for athlete in athletes if query in athlete.full_name.lower()]
 
 
 def sort_athletes(

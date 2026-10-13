@@ -1,32 +1,10 @@
 from typing import List
 
-from athletes import (
-    add_athlete,
-    get_athlete_by_id,
-    sort_athletes,
-)
-from competitions import (
-    add_competition,
-    get_competition_by_id,
-    sort_competitions,
-)
-from disciplines import (
-    add_discipline,
-    get_discipline_by_id,
-    sort_disciplines,
-)
-from models import (
-    Athlete,
-    Competition,
-    Discipline,
-    Result,
-)
-from results import (
-    add_result,
-    delete_result,
-    get_statistics,
-    sort_results,
-)
+from athletes import add_athlete, get_athlete_by_id, sort_athletes
+from competitions import add_competition, get_competition_by_id, sort_competitions
+from disciplines import add_discipline, get_discipline_by_id, sort_disciplines
+from models import Athlete, Competition, Discipline, Result
+from results import add_result, delete_result, get_statistics, sort_results
 from storage import (
     load_athletes,
     load_competitions,
@@ -34,11 +12,7 @@ from storage import (
     load_results,
     save_objects,
 )
-from utils import (
-    input_float,
-    input_int,
-)
-
+from utils import input_float, input_int
 
 ATHLETES_FILE = "data/athletes.json"
 DISCIPLINES_FILE = "data/disciplines.json"
@@ -102,28 +76,19 @@ def show_results(
         print(result)
 
         standard_status = (
-            "Норматив выполнен"
-            if result.check_standard()
-            else "Норматив не выполнен"
+            "Норматив выполнен" if result.check_standard() else "Норматив не выполнен"
         )
 
-        print(
-            f"   {result.get_place_status()} | "
-            f"{standard_status}"
-        )
+        print(f"   {result.get_place_status()} | " f"{standard_status}")
 
 
 def create_athlete(
     athletes: List[Athlete],
 ) -> None:
     """Создать спортсмена."""
-    full_name = input(
-        "ФИО спортсмена: "
-    )
+    full_name = input("ФИО спортсмена: ")
 
-    birth_year = input_int(
-        "Год рождения: "
-    )
+    birth_year = input_int("Год рождения: ")
 
     try:
         athlete = add_athlete(
@@ -141,22 +106,16 @@ def create_athlete(
         athletes,
     )
 
-    print(
-        f"Спортсмен добавлен: {athlete}"
-    )
+    print(f"Спортсмен добавлен: {athlete}")
 
 
 def create_discipline(
     disciplines: List[Discipline],
 ) -> None:
     """Создать спортивную дисциплину."""
-    name = input(
-        "Название дисциплины: "
-    )
+    name = input("Название дисциплины: ")
 
-    unit = input(
-        "Единица измерения: "
-    )
+    unit = input("Единица измерения: ")
 
     try:
         discipline = add_discipline(
@@ -174,22 +133,16 @@ def create_discipline(
         disciplines,
     )
 
-    print(
-        f"Дисциплина добавлена: {discipline}"
-    )
+    print(f"Дисциплина добавлена: {discipline}")
 
 
 def create_competition(
     competitions: List[Competition],
 ) -> None:
     """Создать соревнование."""
-    name = input(
-        "Название соревнования: "
-    )
+    name = input("Название соревнования: ")
 
-    competition_date = input(
-        "Дата в формате ГГГГ-ММ-ДД: "
-    )
+    competition_date = input("Дата в формате ГГГГ-ММ-ДД: ")
 
     try:
         competition = add_competition(
@@ -207,9 +160,7 @@ def create_competition(
         competitions,
     )
 
-    print(
-        f"Соревнование добавлено: {competition}"
-    )
+    print(f"Соревнование добавлено: {competition}")
 
 
 def create_result(
@@ -221,9 +172,7 @@ def create_result(
     """Создать спортивный результат."""
     show_athletes(athletes)
 
-    athlete_id = input_int(
-        "ID спортсмена: "
-    )
+    athlete_id = input_int("ID спортсмена: ")
 
     athlete = get_athlete_by_id(
         athletes,
@@ -236,9 +185,7 @@ def create_result(
 
     show_disciplines(disciplines)
 
-    discipline_id = input_int(
-        "ID дисциплины: "
-    )
+    discipline_id = input_int("ID дисциплины: ")
 
     discipline = get_discipline_by_id(
         disciplines,
@@ -251,9 +198,7 @@ def create_result(
 
     show_competitions(competitions)
 
-    competition_id = input_int(
-        "ID соревнования: "
-    )
+    competition_id = input_int("ID соревнования: ")
 
     competition = get_competition_by_id(
         competitions,
@@ -264,17 +209,11 @@ def create_result(
         print("Соревнование не найдено")
         return
 
-    value = input_float(
-        "Результат: "
-    )
+    value = input_float("Результат: ")
 
-    place = input_int(
-        "Занятое место: "
-    )
+    place = input_int("Занятое место: ")
 
-    standard = input_float(
-        "Норматив: "
-    )
+    standard = input_float("Норматив: ")
 
     try:
         result = add_result(
@@ -296,13 +235,9 @@ def create_result(
         results,
     )
 
-    print(
-        f"Результат добавлен: {result}"
-    )
+    print(f"Результат добавлен: {result}")
 
-    print(
-        result.get_place_status()
-    )
+    print(result.get_place_status())
 
     if result.check_standard():
         print("Норматив выполнен")
@@ -314,9 +249,7 @@ def remove_result(
     results: List[Result],
 ) -> None:
     """Удалить спортивный результат."""
-    result_id = input_int(
-        "ID результата: "
-    )
+    result_id = input_int("ID результата: ")
 
     if delete_result(
         results,
@@ -337,9 +270,7 @@ def show_statistics(
     results: List[Result],
 ) -> None:
     """Вывести статистику."""
-    statistics = get_statistics(
-        results
-    )
+    statistics = get_statistics(results)
 
     if statistics["count"] == 0:
         print("Нет данных для статистики")
@@ -366,10 +297,7 @@ def show_statistics(
 
 def print_menu() -> None:
     """Вывести главное меню."""
-    print(
-        "\n=== Система учета "
-        "спортивных результатов ==="
-    )
+    print("\n=== Система учета " "спортивных результатов ===")
 
     print("1. Показать спортсменов")
     print("2. Добавить спортсмена")
@@ -386,17 +314,11 @@ def print_menu() -> None:
 
 def main() -> None:
     """Запустить приложение."""
-    athletes = load_athletes(
-        ATHLETES_FILE
-    )
+    athletes = load_athletes(ATHLETES_FILE)
 
-    disciplines = load_disciplines(
-        DISCIPLINES_FILE
-    )
+    disciplines = load_disciplines(DISCIPLINES_FILE)
 
-    competitions = load_competitions(
-        COMPETITIONS_FILE
-    )
+    competitions = load_competitions(COMPETITIONS_FILE)
 
     results = load_results(
         RESULTS_FILE,
@@ -408,9 +330,7 @@ def main() -> None:
     while True:
         print_menu()
 
-        choice = input(
-            "Выберите действие: "
-        ).strip()
+        choice = input("Выберите действие: ").strip()
 
         if choice == "1":
             show_athletes(athletes)
@@ -448,15 +368,11 @@ def main() -> None:
             show_statistics(results)
 
         elif choice == "0":
-            print(
-                "Работа программы завершена"
-            )
+            print("Работа программы завершена")
             break
 
         else:
-            print(
-                "Неизвестный пункт меню"
-            )
+            print("Неизвестный пункт меню")
 
 
 if __name__ == "__main__":

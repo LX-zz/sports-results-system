@@ -10,24 +10,19 @@ def add_competition(
 ) -> Competition:
     """Создать и добавить соревнование."""
     for competition in competitions:
-        same_name = (
-            competition.name.lower()
-            == name.strip().lower()
-        )
-        same_date = (
-            competition.date
-            == competition_date.strip()
-        )
+        same_name = competition.name.lower() == name.strip().lower()
+        same_date = competition.date == competition_date.strip()
 
         if same_name and same_date:
-            raise ValueError(
-                "Такое соревнование уже существует"
-            )
+            raise ValueError("Такое соревнование уже существует")
 
-    competition_id = max(
-        (competition.id for competition in competitions),
-        default=0,
-    ) + 1
+    competition_id = (
+        max(
+            (competition.id for competition in competitions),
+            default=0,
+        )
+        + 1
+    )
 
     competition = Competition(
         competition_id=competition_id,
@@ -47,9 +42,7 @@ def find_competitions(
     query = query.lower().strip()
 
     return [
-        competition
-        for competition in competitions
-        if query in competition.name.lower()
+        competition for competition in competitions if query in competition.name.lower()
     ]
 
 
