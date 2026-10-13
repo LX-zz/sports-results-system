@@ -73,7 +73,11 @@ def load_results(
 
     for item in data:
         athlete = next(
-            (athlete for athlete in athletes if athlete.id == item["athlete_id"]),
+            (
+                athlete
+                for athlete in athletes
+                if athlete.id == item["athlete_id"]
+            ),
             None,
         )
 

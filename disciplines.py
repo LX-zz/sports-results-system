@@ -39,7 +39,9 @@ def find_disciplines(
     query = query.lower().strip()
 
     return [
-        discipline for discipline in disciplines if query in discipline.name.lower()
+        discipline
+        for discipline in disciplines
+        if query in discipline.name.lower()
     ]
 
 

@@ -1,17 +1,13 @@
 from typing import List
 
 from athletes import add_athlete, get_athlete_by_id, sort_athletes
-from competitions import add_competition, get_competition_by_id, sort_competitions
+from competitions import (add_competition, get_competition_by_id,
+                          sort_competitions)
 from disciplines import add_discipline, get_discipline_by_id, sort_disciplines
 from models import Athlete, Competition, Discipline, Result
 from results import add_result, delete_result, get_statistics, sort_results
-from storage import (
-    load_athletes,
-    load_competitions,
-    load_disciplines,
-    load_results,
-    save_objects,
-)
+from storage import (load_athletes, load_competitions, load_disciplines,
+                     load_results, save_objects)
 from utils import input_float, input_int
 
 ATHLETES_FILE = "data/athletes.json"
@@ -76,7 +72,9 @@ def show_results(
         print(result)
 
         standard_status = (
-            "Норматив выполнен" if result.check_standard() else "Норматив не выполнен"
+            "Норматив выполнен"
+            if result.check_standard()
+            else "Норматив не выполнен"
         )
 
         print(f"   {result.get_place_status()} | " f"{standard_status}")

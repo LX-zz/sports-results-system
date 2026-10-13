@@ -8,3 +8,5 @@ urlpatterns = [
     path("", include("homepage.urls")),
     path("", include("sports.urls")),
 ]
+
+handler404 = "homepage.views.page_not_found"

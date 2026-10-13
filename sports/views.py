@@ -2,13 +2,8 @@
 
 from django.http import Http404, HttpResponse
 
-from storage import (
-    load_athletes,
-    load_competitions,
-    load_disciplines,
-    load_results,
-)
-
+from storage import (load_athletes, load_competitions, load_disciplines,
+                     load_results)
 
 ATHLETES_FILE = "data/athletes.json"
 DISCIPLINES_FILE = "data/disciplines.json"
@@ -69,17 +64,11 @@ def page(
 
 def get_project_data():
     """Загрузить данные предметной области."""
-    athletes_list = load_athletes(
-        ATHLETES_FILE
-    )
+    athletes_list = load_athletes(ATHLETES_FILE)
 
-    disciplines_list = load_disciplines(
-        DISCIPLINES_FILE
-    )
+    disciplines_list = load_disciplines(DISCIPLINES_FILE)
 
-    competitions_list = load_competitions(
-        COMPETITIONS_FILE
-    )
+    competitions_list = load_competitions(COMPETITIONS_FILE)
 
     results_list = load_results(
         RESULTS_FILE,
@@ -148,23 +137,15 @@ def athlete_detail(
     athletes_list, _, _, results_list = get_project_data()
 
     athlete = next(
-        (
-            item
-            for item in athletes_list
-            if item.id == athlete_id
-        ),
+        (item for item in athletes_list if item.id == athlete_id),
         None,
     )
 
     if athlete is None:
-        raise Http404(
-            "Спортсмен не найден"
-        )
+        raise Http404("Спортсмен не найден")
 
     athlete_results = [
-        result
-        for result in results_list
-        if result.athlete.id == athlete.id
+        result for result in results_list if result.athlete.id == athlete.id
     ]
 
     result_items = ""
@@ -324,18 +305,12 @@ def result_detail(
     _, _, _, results_list = get_project_data()
 
     result = next(
-        (
-            item
-            for item in results_list
-            if item.id == result_id
-        ),
+        (item for item in results_list if item.id == result_id),
         None,
     )
 
     if result is None:
-        raise Http404(
-            "Результат не найден"
-        )
+        raise Http404("Результат не найден")
 
     standard_status = (
         "Норматив выполнен"

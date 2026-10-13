@@ -34,7 +34,9 @@ def find_athletes(
     """Найти спортсменов по имени."""
     query = query.lower().strip()
 
-    return [athlete for athlete in athletes if query in athlete.full_name.lower()]
+    return [
+        athlete for athlete in athletes if query in athlete.full_name.lower()
+    ]
 
 
 def sort_athletes(

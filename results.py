@@ -61,7 +61,9 @@ def find_results(
     discipline_id: int,
 ) -> List[Result]:
     """Найти результаты по дисциплине."""
-    return [result for result in results if result.discipline.id == discipline_id]
+    return [
+        result for result in results if result.discipline.id == discipline_id
+    ]
 
 
 def sort_results(

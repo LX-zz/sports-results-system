@@ -42,7 +42,9 @@ def find_competitions(
     query = query.lower().strip()
 
     return [
-        competition for competition in competitions if query in competition.name.lower()
+        competition
+        for competition in competitions
+        if query in competition.name.lower()
     ]
 
 
