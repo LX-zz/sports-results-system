@@ -4,6 +4,7 @@ from django.urls import path
 
 from . import views
 
+
 app_name = "sports"
 
 urlpatterns = [
@@ -11,6 +12,11 @@ urlpatterns = [
         "athletes/",
         views.athletes,
         name="athletes",
+    ),
+    path(
+        "athletes/search/",
+        views.athlete_search,
+        name="athlete_search",
     ),
     path(
         "athletes/<int:athlete_id>/",
@@ -31,5 +37,10 @@ urlpatterns = [
         "competitions/",
         views.competitions,
         name="competitions",
+    ),
+    path(
+        "statistics/",
+        views.statistics,
+        name="statistics",
     ),
 ]

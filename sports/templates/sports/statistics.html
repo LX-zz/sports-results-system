@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}
+Статистика — Sports Results
+{% endblock %}
+
+{% block content %}
+
+<h1>Статистика спортивных результатов</h1>
+
+{% for item in statistics %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h2>{{ item.discipline_name }}</h2>
+
+            <p>
+                Количество результатов:
+                {{ item.results_count }}
+            </p>
+
+            {% if item.best_result %}
+                <p>
+                    Лучший результат:
+                    {{ item.best_result }}
+                    {{ item.unit }}
+                </p>
+
+                <p>
+                    Средний результат:
+                    {{ item.average_result|floatformat:2 }}
+                    {{ item.unit }}
+                </p>
+            {% else %}
+                <p>Результатов пока нет.</p>
+            {% endif %}
+        </div>
+    </div>
+{% empty %}
+    <p>Данные отсутствуют.</p>
+{% endfor %}
+
+{% endblock %}

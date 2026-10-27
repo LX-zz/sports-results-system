@@ -1,62 +1,76 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Спортсмен — Sports Results
+{% if athlete %}
+{{ athlete.full_name }} — Sports Results
+{% else %}
+Спортсмен не найден — Sports Results
+{% endif %}
 {% endblock %}
 
 {% block content %}
 
 {% if athlete %}
 
-<h1>
-    {{ athlete.full_name }}
-</h1>
+<h1>{{ athlete.full_name }}</h1>
 
-<p>
-    <strong>ID:</strong>
-    {{ athlete.id }}
-</p>
+<p><strong>ID:</strong> {{ athlete.id }}</p>
+<p><strong>Год рождения:</strong> {{ athlete.birth_year }}</p>
 
-<p>
-    <strong>Год рождения:</strong>
-    {{ athlete.birth_year }}
-</p>
+<h2 class="mt-4">Результаты спортсмена</h2>
 
-<h2 class="mt-4">
-    Результаты спортсмена
-</h2>
+{% for result in athlete_results %}
+<div class="card mb-3">
+    <div class="card-body">
 
-<ul class="list-group">
-    {% for result in athlete_results %}
-        <li class="list-group-item">
-            {{ result.discipline.name }}:
-            {{ result.value }}
-            {{ result.discipline.unit }},
-            место {{ result.place }}
-        </li>
-    {% empty %}
-        <li class="list-group-item">
-            Результаты отсутствуют.
-        </li>
-    {% endfor %}
-</ul>
+        <h5 class="card-title">
+            {{ result.discipline_name }}
+        </h5>
 
-<a
-    class="btn btn-secondary mt-4"
-    href="{% url 'sports:athletes' %}">
+        <p><strong>Соревнование:</strong> {{ result.competition_name }}</p>
+        <p><strong>Дата:</strong> {{ result.competition_date }}</p>
+
+        <p>
+            <strong>Результат:</strong>
+            {{ result.result }} {{ result.unit }}
+        </p>
+
+        <p><strong>Место:</strong> {{ result.place }}</p>
+
+        <p>
+            <strong>Норматив:</strong>
+            {{ result.standard }} {{ result.unit }}
+        </p>
+
+        {% if result.standard_met %}
+            <span class="badge text-bg-success">
+                Норматив выполнен
+            </span>
+        {% else %}
+            <span class="badge text-bg-danger">
+                Норматив не выполнен
+            </span>
+        {% endif %}
+
+    </div>
+</div>
+
+{% empty %}
+<p>У спортсмена пока нет результатов.</p>
+{% endfor %}
+
+<a href="{% url 'sports:athletes' %}"
+   class="btn btn-secondary mt-3">
     ← К списку спортсменов
 </a>
 
 {% else %}
 
-<h1 class="text-danger">
-    Спортсмен не найден
-</h1>
+<h1>Спортсмен не найден</h1>
 
-<a
-    class="btn btn-primary"
-    href="{% url 'sports:athletes' %}">
-    К списку спортсменов
+<a href="{% url 'sports:athletes' %}"
+   class="btn btn-secondary">
+    ← К списку спортсменов
 </a>
 
 {% endif %}
