@@ -1,19 +1,144 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Результаты — Sports Results
+    Спортивные результаты — Sports Results
 {% endblock %}
 
 {% block content %}
 
-<h1 class="mb-4">
-    Спортивные результаты
-</h1>
+<h1 class="mb-4">Спортивные результаты</h1>
 
 <p class="text-muted">
-    Всего результатов: {{ results|length }}
+    Найдено результатов: {{ total_count }}
 </p>
 
+<form method="get" class="card mb-4">
+    <div class="card-body">
+        <h2 class="h5 mb-3">Поиск и фильтры</h2>
+
+        <div class="mb-3">
+            <label for="q" class="form-label">
+                Поиск по спортсмену, дисциплине или соревнованию
+            </label>
+            <input
+                type="text"
+                name="q"
+                id="q"
+                value="{{ search }}"
+                class="form-control"
+                placeholder="Введите название или ФИО"
+            >
+        </div>
+
+        <div class="mb-3">
+            <label for="place" class="form-label">
+                Место
+            </label>
+            <input
+                type="number"
+                name="place"
+                id="place"
+                value="{{ place }}"
+                min="1"
+                class="form-control"
+                placeholder="Любое место"
+            >
+        </div>
+
+        <div class="mb-3">
+            <label for="discipline" class="form-label">
+                Дисциплина
+            </label>
+            <select name="discipline" id="discipline"
+                    class="form-select">
+                <option value="">Все дисциплины</option>
+                {% for discipline in disciplines %}
+                    <option value="{{ discipline.id }}"
+                        {% if discipline_id == discipline.id|stringformat:"s" %}
+                            selected
+                        {% endif %}>
+                        {{ discipline.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="competition" class="form-label">
+                Соревнование
+            </label>
+            <select name="competition" id="competition"
+                    class="form-select">
+                <option value="">Все соревнования</option>
+                {% for competition in competitions %}
+                    <option value="{{ competition.id }}"
+                        {% if competition_id == competition.id|stringformat:"s" %}
+                            selected
+                        {% endif %}>
+                        {{ competition.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="standard" class="form-label">
+                Норматив
+            </label>
+            <select name="standard" id="standard"
+                    class="form-select">
+                <option value="">Любой</option>
+                <option value="yes"
+                    {% if standard == "yes" %}selected{% endif %}>
+                    Выполнен
+                </option>
+                <option value="no"
+                    {% if standard == "no" %}selected{% endif %}>
+                    Не выполнен
+                </option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="sort" class="form-label">
+                Сортировка
+            </label>
+            <select name="sort" id="sort" class="form-select">
+                <option value="place"
+                    {% if sort == "place" %}selected{% endif %}>
+                    По месту
+                </option>
+                <option value="result"
+                    {% if sort == "result" %}selected{% endif %}>
+                    По результату (возрастание)
+                </option>
+                <option value="-result"
+                    {% if sort == "-result" %}selected{% endif %}>
+                    По результату (убывание)
+                </option>
+                <option value="athlete"
+                    {% if sort == "athlete" %}selected{% endif %}>
+                    По ФИО спортсмена
+                </option>
+                <option value="date"
+                    {% if sort == "date" %}selected{% endif %}>
+                    По дате соревнования
+                </option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Применить
+        </button>
+
+        <a href="{% url 'sports:results' %}"
+           class="btn btn-outline-secondary">
+            Сбросить
+        </a>
+    </div>
+</form>
+
+<div class="table-responsive">
 <table class="table table-striped">
     <thead>
         <tr>
@@ -29,45 +154,84 @@
 
     <tbody>
         {% for result in results %}
-            <tr>
-                <td>{{ result.id }}</td>
+        <tr>
+            <td>{{ result.id }}</td>
 
-                <td>
+            <td>
+                <a href="{% url 'sports:athlete_detail' result.athlete.id %}">
                     {{ result.athlete.full_name }}
-                </td>
+                </a>
+            </td>
 
-                <td>
-                    {{ result.discipline.name }}
-                </td>
+            <td>{{ result.discipline.name }}</td>
+            <td>{{ result.competition.name }}</td>
 
-                <td>
-                    {{ result.competition.name }}
-                </td>
+            <td>
+                <a href="{% url 'sports:result_detail' result.id %}">
+                    {{ result.result }}
+                    {{ result.discipline.unit }}
+                </a>
+            </td>
 
-                <td>
-                    <a href="{% url 'sports:result_detail' result.id %}">
-                        {{ result.value }}
-                        {{ result.discipline.unit }}
-                    </a>
-                </td>
+            <td>{{ result.place }}</td>
 
-                <td>
-                    {{ result.place }}
-                </td>
-
-                <td>
-    {% include "sports/includes/result_status.html" %}
-</td>
-
-            </tr>
+            <td>
+                {% if result.check_standard %}
+                    <span class="badge text-bg-success">
+                        Выполнен
+                    </span>
+                {% else %}
+                    <span class="badge text-bg-danger">
+                        Не выполнен
+                    </span>
+                {% endif %}
+            </td>
+        </tr>
         {% empty %}
-            <tr>
-                <td colspan="7">
-                    Результаты отсутствуют.
-                </td>
-            </tr>
+        <tr>
+            <td colspan="7">
+                Результаты по выбранным условиям отсутствуют.
+            </td>
+        </tr>
         {% endfor %}
     </tbody>
 </table>
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<nav aria-label="Страницы результатов">
+    <ul class="pagination">
+
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link"
+                   href="?q={{ search|urlencode }}&place={{ place }}&discipline={{ discipline_id }}&competition={{ competition_id }}&standard={{ standard }}&sort={{ sort }}&page={{ page_obj.previous_page_number }}">
+                    Назад
+                </a>
+            </li>
+        {% endif %}
+
+        {% for number in page_obj.paginator.page_range %}
+            <li class="page-item
+                {% if page_obj.number == number %}active{% endif %}">
+                <a class="page-link"
+                   href="?q={{ search|urlencode }}&place={{ place }}&discipline={{ discipline_id }}&competition={{ competition_id }}&standard={{ standard }}&sort={{ sort }}&page={{ number }}">
+                    {{ number }}
+                </a>
+            </li>
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link"
+                   href="?q={{ search|urlencode }}&place={{ place }}&discipline={{ discipline_id }}&competition={{ competition_id }}&standard={{ standard }}&sort={{ sort }}&page={{ page_obj.next_page_number }}">
+                    Вперёд
+                </a>
+            </li>
+        {% endif %}
+
+    </ul>
+</nav>
+{% endif %}
 
 {% endblock %}

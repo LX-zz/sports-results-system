@@ -1,83 +1,42 @@
-"""View-функции спортивной части проекта."""
+"""Представления Sports Results на Django ORM."""
 
+from django.core.paginator import Paginator
+from django.db.models import Avg, Count, F, Min, Q
 from django.shortcuts import render
 
-from db.database import get_connection
+from .models import Athlete, Competition, Discipline, Result
 
 
 def athletes(request):
-    """Показать список спортсменов из SQLite."""
-    conn = get_connection()
-
-    athletes_data = conn.execute(
-        """
-        SELECT
-            id,
-            full_name,
-            birth_year
-        FROM athletes
-        ORDER BY full_name;
-        """
-    ).fetchall()
-
-    conn.close()
+    """Список спортсменов с количеством результатов."""
+    athletes_data = (
+        Athlete.objects
+        .annotate(results_count=Count("results"))
+        .order_by("full_name")
+    )
 
     return render(
         request,
         "sports/athlete_list.html",
-        {
-            "athletes": athletes_data,
-        },
+        {"athletes": athletes_data},
     )
 
 
-def athlete_detail(request, athlete_id: int):
-    """Показать спортсмена и его результаты."""
-    conn = get_connection()
-
-    athlete = conn.execute(
-        """
-        SELECT
-            id,
-            full_name,
-            birth_year
-        FROM athletes
-        WHERE id = ?;
-        """,
-        (athlete_id,),
-    ).fetchone()
+def athlete_detail(request, athlete_id):
+    """Подробная информация о спортсмене."""
+    try:
+        athlete = Athlete.objects.get(pk=athlete_id)
+    except Athlete.DoesNotExist:
+        athlete = None
 
     athlete_results = []
 
     if athlete is not None:
-        athlete_results = conn.execute(
-            """
-            SELECT
-                results.id,
-                disciplines.name AS discipline_name,
-                competitions.name AS competition_name,
-                competitions.date AS competition_date,
-                results.result,
-                disciplines.unit,
-                results.place,
-                results.standard,
-                CASE
-                    WHEN results.result <= results.standard
-                    THEN 1
-                    ELSE 0
-                END AS standard_met
-            FROM results
-            JOIN disciplines
-                ON results.discipline_id = disciplines.id
-            JOIN competitions
-                ON results.competition_id = competitions.id
-            WHERE results.athlete_id = ?
-            ORDER BY competitions.date;
-            """,
-            (athlete_id,),
-        ).fetchall()
-
-    conn.close()
+        athlete_results = (
+            athlete.results
+            .select_related("discipline", "competition")
+            .order_by("competition__date", "place")
+        )
 
     return render(
         request,
@@ -91,183 +50,187 @@ def athlete_detail(request, athlete_id: int):
 
 
 def competitions(request):
-    """Показать список соревнований из SQLite."""
-    conn = get_connection()
-
-    competitions_data = conn.execute(
-        """
-        SELECT
-            id,
-            name,
-            date
-        FROM competitions
-        ORDER BY date;
-        """
-    ).fetchall()
-
-    conn.close()
+    """Список соревнований."""
+    competitions_data = (
+        Competition.objects
+        .annotate(results_count=Count("results"))
+        .order_by("-date", "name")
+    )
 
     return render(
         request,
         "sports/competition_list.html",
-        {
-            "competitions": competitions_data,
-        },
+        {"competitions": competitions_data},
     )
 
 
 def results(request):
-    """Показать результаты со связанными данными."""
-    conn = get_connection()
+    """Результаты: поиск, фильтрация, сортировка и пагинация."""
+    queryset = Result.objects.select_related(
+        "athlete",
+        "discipline",
+        "competition",
+    )
 
-    results_data = conn.execute(
-        """
-        SELECT
-            results.id,
-            athletes.id AS athlete_id,
-            athletes.full_name AS athlete_name,
-            disciplines.name AS discipline_name,
-            competitions.name AS competition_name,
-            competitions.date AS competition_date,
-            results.result,
-            disciplines.unit,
-            results.place,
-            results.standard,
-            CASE
-                WHEN results.result <= results.standard
-                THEN 1
-                ELSE 0
-            END AS standard_met
-        FROM results
-        JOIN athletes
-            ON results.athlete_id = athletes.id
-        JOIN disciplines
-            ON results.discipline_id = disciplines.id
-        JOIN competitions
-            ON results.competition_id = competitions.id
-        ORDER BY results.place, athletes.full_name;
-        """
-    ).fetchall()
+    search = request.GET.get("q", "").strip()
+    place = request.GET.get("place", "").strip()
+    discipline_id = request.GET.get("discipline", "").strip()
+    competition_id = request.GET.get("competition", "").strip()
+    standard = request.GET.get("standard", "").strip()
+    sort = request.GET.get("sort", "place").strip()
 
-    conn.close()
+    if search:
+        queryset = queryset.filter(
+            Q(athlete__full_name__icontains=search)
+            | Q(discipline__name__icontains=search)
+            | Q(competition__name__icontains=search)
+        )
+
+    if place.isdigit():
+        queryset = queryset.filter(place=int(place))
+
+    if discipline_id.isdigit():
+        queryset = queryset.filter(
+            discipline_id=int(discipline_id)
+        )
+
+    if competition_id.isdigit():
+        queryset = queryset.filter(
+            competition_id=int(competition_id)
+        )
+
+    if standard == "yes":
+        queryset = queryset.filter(
+            result__lte=F("standard")
+        )
+    elif standard == "no":
+        queryset = queryset.exclude(
+            result__lte=F("standard")
+        )
+
+    sorting = {
+        "place": ("place", "result", "id"),
+        "result": ("result", "id"),
+        "-result": ("-result", "id"),
+        "athlete": ("athlete__full_name", "id"),
+        "date": ("-competition__date", "id"),
+    }
+
+    if sort not in sorting:
+        sort = "place"
+
+    queryset = queryset.order_by(*sorting[sort])
+
+    paginator = Paginator(queryset, 5)
+    page_obj = paginator.get_page(
+        request.GET.get("page")
+    )
 
     return render(
         request,
         "sports/result_list.html",
         {
-            "results": results_data,
+            "results": page_obj,
+            "page_obj": page_obj,
+            "total_count": paginator.count,
+            "search": search,
+            "place": place,
+            "discipline_id": discipline_id,
+            "competition_id": competition_id,
+            "standard": standard,
+            "sort": sort,
+            "disciplines": Discipline.objects.all(),
+            "competitions": Competition.objects.all(),
         },
-    ) 
+    )
 
 
-def result_detail(request, result_id: int):
-    """Показать отдельный результат из SQLite."""
-    conn = get_connection()
-
-    result = conn.execute(
-        """
-        SELECT
-            results.id,
-            athletes.id AS athlete_id,
-            athletes.full_name AS athlete_name,
-            disciplines.name AS discipline_name,
-            competitions.name AS competition_name,
-            competitions.date AS competition_date,
-            results.result,
-            disciplines.unit,
-            results.place,
-            results.standard,
-            CASE
-                WHEN results.result <= results.standard
-                THEN 1
-                ELSE 0
-            END AS standard_met
-        FROM results
-        JOIN athletes
-            ON results.athlete_id = athletes.id
-        JOIN disciplines
-            ON results.discipline_id = disciplines.id
-        JOIN competitions
-            ON results.competition_id = competitions.id
-        WHERE results.id = ?;
-        """,
-        (result_id,),
-    ).fetchone()
-
-    conn.close()
+def result_detail(request, result_id):
+    """Подробная информация о результате."""
+    try:
+        result = (
+            Result.objects
+            .select_related(
+                "athlete",
+                "discipline",
+                "competition",
+            )
+            .get(pk=result_id)
+        )
+    except Result.DoesNotExist:
+        result = None
 
     return render(
         request,
         "sports/result_detail.html",
-        {
-            "result": result,
-        },
+        {"result": result},
         status=404 if result is None else 200,
     )
 
 
 def athlete_search(request):
-    """Найти спортсменов по минимальному году рождения."""
-    birth_year = request.GET.get("birth_year")
-    athletes_data = []
+    """Поиск спортсменов по имени и году рождения."""
+    birth_year = request.GET.get("birth_year", "").strip()
+    name = request.GET.get("name", "").strip()
+
+    athletes_data = Athlete.objects.all()
+    searched = bool(birth_year or name)
+    error = ""
+
+    if name:
+        athletes_data = athletes_data.filter(
+            full_name__icontains=name
+        )
 
     if birth_year:
-        conn = get_connection()
+        if birth_year.isdigit() and 1900 <= int(birth_year) <= 2100:
+            athletes_data = athletes_data.filter(
+                birth_year__gte=int(birth_year)
+            )
+        else:
+            error = "Укажите корректный год рождения."
+            athletes_data = athletes_data.none()
 
-        athletes_data = conn.execute(
-            """
-            SELECT
-                id,
-                full_name,
-                birth_year
-            FROM athletes
-            WHERE birth_year >= ?
-            ORDER BY birth_year, full_name;
-            """,
-            (birth_year,),
-        ).fetchall()
-
-        conn.close()
+    athletes_data = athletes_data.order_by(
+        "birth_year",
+        "full_name",
+    )
 
     return render(
         request,
         "sports/athlete_search.html",
         {
-            "athletes": athletes_data,
+            "athletes": athletes_data if searched else [],
             "birth_year": birth_year,
+            "name": name,
+            "searched": searched,
+            "error": error,
         },
     )
 
 
 def statistics(request):
-    """Показать статистику результатов по дисциплинам."""
-    conn = get_connection()
+    """Статистика по дисциплинам средствами ORM."""
+    statistics_data = (
+        Discipline.objects
+        .annotate(
+            results_count=Count("results"),
+            best_result=Min("results__result"),
+            average_result=Avg("results__result"),
+        )
+        .order_by("-results_count", "name")
+    )
 
-    statistics_data = conn.execute(
-        """
-        SELECT
-            disciplines.name AS discipline_name,
-            disciplines.unit,
-            COUNT(results.id) AS results_count,
-            MIN(results.result) AS best_result,
-            AVG(results.result) AS average_result
-        FROM disciplines
-        LEFT JOIN results
-            ON disciplines.id = results.discipline_id
-        GROUP BY
-            disciplines.id,
-            disciplines.name,
-            disciplines.unit
-        ORDER BY results_count DESC, disciplines.name;
-        """
-    ).fetchall()
-
-    conn.close()
+    overall = Result.objects.aggregate(
+        total_results=Count("id"),
+        average_result=Avg("result"),
+    )
 
     return render(
         request,
         "sports/statistics.html",
         {
             "statistics": statistics_data,
+            "overall": overall,
         },
     )
