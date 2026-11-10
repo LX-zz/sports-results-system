@@ -1,6 +1,3 @@
--- ==========================================
--- Sports Results: SQL-запросы ПР7
--- ==========================================
 
 
 -- 1. Список всех спортсменов
@@ -61,6 +58,7 @@ JOIN disciplines
 JOIN competitions
     ON results.competition_id = competitions.id
 ORDER BY results.id;
+
 
 
 -- 6. Спортсмены и соревнования, в которых они участвовали

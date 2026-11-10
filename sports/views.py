@@ -157,7 +157,7 @@ def results(request):
         {
             "results": results_data,
         },
-    )
+    ) 
 
 
 def result_detail(request, result_id: int):
