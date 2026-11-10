@@ -252,3 +252,36 @@ sports/
 
 
 
+
+## Практическая работа №9 — Django ORM
+
+Проект Sports Results переведён с ручных SQL-запросов на Django ORM.
+
+### Модели
+- Athlete — спортсмен.
+- Discipline — спортивная дисциплина.
+- Competition — соревнование.
+- Result — результат спортсмена с тремя внешними ключами.
+
+### Реализованная функциональность
+- Миграции Django.
+- Перенос данных из SQLite ПР7 в Django ORM.
+- Создание, чтение, изменение и удаление записей.
+- Поиск и фильтрация через ORM.
+- Сортировка результатов.
+- Связанные объекты и select_related().
+- Агрегирование через annotate() и aggregate().
+- Постраничный вывод через Paginator.
+
+### Проверка
+
+Команды проверки проекта:
+
+    python manage.py check
+    python manage.py test sports.tests_pr9 -v 2
+    pytest -v
+    flake8 .
+
+### Репозиторий
+
+https://github.com/LX-zz/sports-results-system
