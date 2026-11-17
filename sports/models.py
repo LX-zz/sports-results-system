@@ -43,6 +43,14 @@ class Discipline(models.Model):
 
 
 class Competition(models.Model):
+    slug = models.SlugField(
+        max_length=250,
+        unique=True,
+        blank=True,
+        null=True,
+        allow_unicode=True,
+        verbose_name="Адрес соревнования",
+    )
     name = models.CharField(
         max_length=200,
         verbose_name="Название соревнования",
@@ -59,6 +67,31 @@ class Competition(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+
+        return reverse(
+            "sports:competition_detail",
+            kwargs={"slug": self.slug},
+        )
+
+    def save(self, *args, **kwargs):
+        from django.utils.text import slugify
+
+        super().save(*args, **kwargs)
+
+        if not self.slug:
+            base_slug = slugify(
+                self.name,
+                allow_unicode=True,
+            ) or "competition"
+
+            self.slug = f"{base_slug}-{self.pk}"
+
+            type(self).objects.filter(pk=self.pk).update(
+                slug=self.slug
+            )
 
 
 class Result(models.Model):
@@ -93,6 +126,21 @@ class Result(models.Model):
 
     standard = models.FloatField(
         verbose_name="Норматив",
+    )
+
+
+    standard_met = models.GeneratedField(
+        expression=models.Case(
+            models.When(
+                result__lte=models.F("standard"),
+                then=models.Value(True),
+            ),
+            default=models.Value(False),
+            output_field=models.BooleanField(),
+        ),
+        output_field=models.BooleanField(),
+        db_persist=True,
+        verbose_name="Норматив выполнен",
     )
 
     class Meta:

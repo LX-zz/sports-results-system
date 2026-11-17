@@ -27,7 +27,11 @@
         {% for competition in competitions %}
             <tr>
                 <td>{{ competition.id }}</td>
-                <td>{{ competition.name }}</td>
+                <td>
+                    <a href="{{ competition.get_absolute_url }}">
+                        {{ competition.name }}
+                    </a>
+                </td>
                 <td>{{ competition.date }}</td>
             </tr>
         {% empty %}

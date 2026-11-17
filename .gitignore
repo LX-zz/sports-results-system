@@ -4,3 +4,8 @@ __pycache__/
 .DS_Store
 .idea/
 .vscode/
+# Local backups
+backups/
+db_pr9_backup.sqlite3
+data/sports_results_pr7_backup.sqlite
+sports/views_pr7_backup.txt

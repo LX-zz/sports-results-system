@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ competition.name }} — Sports Results
+{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-4">{{ competition.name }}</h1>
+
+<p>
+    <strong>Дата проведения:</strong>
+    {{ competition.date|date:"d.m.Y" }}
+</p>
+
+<p>
+    <strong>ID:</strong>
+    {{ competition.id }}
+</p>
+
+<h2 class="mt-4 mb-3">Результаты соревнования</h2>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Спортсмен</th>
+                <th>Дисциплина</th>
+                <th>Результат</th>
+                <th>Место</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for result in competition_results %}
+                <tr>
+                    <td>
+                        <a href="{% url 'sports:athlete_detail' result.athlete.id %}">
+                            {{ result.athlete.full_name }}
+                        </a>
+                    </td>
+                    <td>{{ result.discipline.name }}</td>
+                    <td>
+                        {{ result.result }}
+                        {{ result.discipline.unit }}
+                    </td>
+                    <td>{{ result.place }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">
+                        Результатов пока нет.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<a href="{% url 'sports:competitions' %}"
+   class="btn btn-secondary mt-3">
+    К списку соревнований
+</a>
+
+{% endblock %}

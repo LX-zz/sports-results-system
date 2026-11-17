@@ -234,3 +234,29 @@ def statistics(request):
             "overall": overall,
         },
     )
+
+
+def competition_detail(request, slug):
+    """Подробная страница соревнования по slug."""
+    from django.shortcuts import get_object_or_404
+
+    competition = get_object_or_404(
+        Competition,
+        slug=slug,
+    )
+
+    competition_results = (
+        Result.objects
+        .filter(competition=competition)
+        .select_related("athlete", "discipline")
+        .order_by("place", "id")
+    )
+
+    return render(
+        request,
+        "sports/competition_detail.html",
+        {
+            "competition": competition,
+            "competition_results": competition_results,
+        },
+    )

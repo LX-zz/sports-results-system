@@ -44,3 +44,12 @@ urlpatterns = [
         name="statistics",
     ),
 ]
+
+
+urlpatterns += [
+    path(
+        "competitions/<str:slug>/",
+        views.competition_detail,
+        name="competition_detail",
+    ),
+]
